@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Run markdown linting with JSON report output
+    - name: Run markdown lint
+      run: |
+        npm install remark-cli remark-preset-lint-consistent vfile-reporter-json
+        npx remark . --use remark-preset-lint-consistent --report vfile-reporter-json 2> remark-lint-report.json
+
+    # Upload the JSON lint report as an artifact
+    - name: Upload markdown lint report
+      uses: actions/upload-artifact@v4
+      with:
+        name: remark-lint-report
+        path: remark-lint-report.json
+
